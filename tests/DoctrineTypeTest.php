@@ -26,6 +26,9 @@ final class DoctrineTypeTest extends KernelTestCase
     private const string DECIMAL_TEXT = '1500.2';
     // How most drivers return DECIMAL and integer columns.
     private const string DECIMAL_COLUMN_TEXT = '1500.20';
+    private const string DECIMAL_DIGITS = '1500.2';
+    // More digits than a float holds: the column keeps them, and so does the type.
+    private const string EXACT_COLUMN_TEXT = '2000000000000000.9';
     private const string INTEGER_TEXT = '1500';
     // 031 is not assigned to any operator.
     private const string UNKNOWN_OPERATOR_E164 = '+261311234567';
@@ -73,23 +76,24 @@ final class DoctrineTypeTest extends KernelTestCase
     }
 
     /**
-     * @return iterable<string, array{mixed, int|float}>
+     * @return iterable<string, array{mixed, string}>
      */
     public static function storedAmounts(): iterable
     {
-        yield 'decimal column text' => [self::DECIMAL_COLUMN_TEXT, self::DECIMAL_AMOUNT];
-        yield 'integer text' => [self::INTEGER_TEXT, self::AMOUNT];
-        yield 'an int from the driver' => [self::AMOUNT, self::AMOUNT];
-        yield 'a float from the driver' => [self::DECIMAL_AMOUNT, self::DECIMAL_AMOUNT];
+        yield 'decimal column text' => [self::DECIMAL_COLUMN_TEXT, self::DECIMAL_DIGITS];
+        yield 'integer text' => [self::INTEGER_TEXT, self::INTEGER_TEXT];
+        yield 'an int from the driver' => [self::AMOUNT, self::INTEGER_TEXT];
+        yield 'a float from the driver' => [self::DECIMAL_AMOUNT, self::DECIMAL_DIGITS];
+        yield 'a decimal column beyond any float' => [self::EXACT_COLUMN_TEXT, self::EXACT_COLUMN_TEXT];
     }
 
     #[DataProvider('storedAmounts')]
-    public function testAStoredAmountIsReadAsAnAriary(mixed $stored, int|float $amount): void
+    public function testAStoredAmountIsReadAsAnAriaryWithoutRounding(mixed $stored, string $digits): void
     {
         $ariary = Type::getType(AriaryType::NAME)->convertToPHPValue($stored, $this->platform);
 
         self::assertInstanceOf(Ariary::class, $ariary);
-        self::assertSame($amount, $ariary->amount);
+        self::assertSame($digits, $ariary->digits);
     }
 
     /**
@@ -100,7 +104,8 @@ final class DoctrineTypeTest extends KernelTestCase
         yield 'phone, not an operator' => [PhoneNumberType::NAME, self::UNKNOWN_OPERATOR_E164];
         yield 'phone, not text' => [PhoneNumberType::NAME, self::AMOUNT];
         yield 'ariary, not a number' => [AriaryType::NAME, 'Ar 1 500'];
-        yield 'ariary, negative' => [AriaryType::NAME, self::NEGATIVE_TEXT];
+        yield 'ariary, negative text' => [AriaryType::NAME, self::NEGATIVE_TEXT];
+        yield 'ariary, a negative int from the driver' => [AriaryType::NAME, -self::AMOUNT];
     }
 
     #[DataProvider('unreadableValues')]

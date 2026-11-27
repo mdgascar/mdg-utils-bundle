@@ -34,7 +34,7 @@ final class AriaryOptionsTest extends TestCase
     #[DataProvider('readableAmounts')]
     public function testReadAcceptsAnAmountInEveryFormAnAppHasIt(mixed $value): void
     {
-        self::assertEquals(self::AMOUNT, (new AriaryOptions())->read($value)->amount);
+        self::assertEquals(self::AMOUNT, (new AriaryOptions())->read($value)->amount());
     }
 
     public function testEnglishStyleOptionsWriteAndReadEnglishStyleText(): void
@@ -42,7 +42,7 @@ final class AriaryOptionsTest extends TestCase
         $options = new AriaryOptions(Grouping::Comma, SymbolPosition::After, DecimalSeparator::Dot);
 
         self::assertSame("1,500.5\u{00A0}Ar", $options->format(Ariary::fromFloat(self::DECIMAL_AMOUNT)));
-        self::assertSame(self::DECIMAL_AMOUNT, $options->read('1,500.5')->amount);
+        self::assertSame(self::DECIMAL_AMOUNT, $options->read('1,500.5')->amount());
         self::assertNull($options->tryRead('1 500'));
     }
 

@@ -4,6 +4,17 @@
 Merging `dev` into `main` tags the version in the first heading below and creates the
 GitHub release; Packagist picks up the tag.
 
+## 0.3.0
+
+Requires `mdgascar/mdg-utils` ^0.10 (spec 0.9.0).
+
+- **Breaking:** `MalagasyPhone` now passes for fixed lines (`020 22 421 19`) and `036` numbers,
+  as the core does. `#[MalagasyPhone(type: PhoneLineType::Mobile)]` accepts mobile numbers
+  only, with its own message and the code `MalagasyPhone::WRONG_TYPE_ERROR`.
+- **Breaking:** the `mg_ariary` Doctrine type stores and reads the amount's exact digits, so
+  amounts never round. The core's `Ariary->amount` is now `amount()`; `digits` has the exact text.
+- The `mg_ordinal` Twig filter: `{{ 3|mg_ordinal }}` prints `fahatelo`.
+
 ## 0.2.0
 
 - **Breaking:** the `mg_words` filter is now `mg_spell`, in the domain's words (core 0.9.0). It
