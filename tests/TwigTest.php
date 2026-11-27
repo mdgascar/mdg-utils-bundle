@@ -19,6 +19,8 @@ final class TwigTest extends KernelTestCase
     private const string E164 = '+261341234567';
     private const int WORDS_NUMBER = 21;
     private const float WORDS_DECIMAL = 0.5;
+    // 30 000 000: 'telopolo tapitrisa' in the standard system.
+    private const int TRADITIONAL_NUMBER = 30_000_000;
     private const string ISO_DATE = '2026-11-27';
 
     /**
@@ -32,6 +34,7 @@ final class TwigTest extends KernelTestCase
         yield 'phone with a format' => ["{{ v|mg_phone('international') }}", PhoneNumber::parse(self::E164), '+261 34 12 345 67'];
         yield 'words from an int' => ['{{ v|mg_words }}', self::WORDS_NUMBER, 'iraika amby roapolo'];
         yield 'words from a float' => ['{{ v|mg_words }}', self::WORDS_DECIMAL, 'aotra faingo dimy'];
+        yield 'words in the traditional system' => ["{{ v|mg_words('traditional') }}", self::TRADITIONAL_NUMBER, 'telo safatsiroa'];
         yield 'date from a DateTime' => ['{{ v|mg_date }}', new \DateTimeImmutable(self::ISO_DATE), '27 Novambra 2026'];
         yield 'date from text with a style' => ["{{ v|mg_date('numeric') }}", self::ISO_DATE, '27/11/2026'];
         foreach (['ariary', 'mg_phone', 'mg_words', 'mg_date'] as $filter) {
