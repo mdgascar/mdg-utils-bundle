@@ -20,6 +20,8 @@ use Mdgascar\MdgUtils\MdgUtilsException;
 final class AriaryType extends Type
 {
     public const string NAME = 'mg_ariary';
+    // A DECIMAL column, as the driver returns it.
+    private const string COLUMN_DIGITS = '/^[0-9]+(?:\.[0-9]+)?$/D';
 
     /**
      * @param array<string, mixed> $column
@@ -36,8 +38,8 @@ final class AriaryType extends Type
                 $value === null => null,
                 \is_int($value) => Ariary::fromInt($value),
                 \is_float($value) => Ariary::fromFloat($value),
-                // Most drivers return DECIMAL columns as text such as "1500.20".
-                \is_string($value) && is_numeric($value) => self::fromNumericText($value),
+                // Most drivers return DECIMAL columns as text such as "1500.20": read it exactly.
+                \is_string($value) && preg_match(self::COLUMN_DIGITS, $value) === 1 => Ariary::fromText($value),
                 default => throw ValueNotConvertible::new($value, Ariary::class),
             };
         } catch (MdgUtilsException $exception) {
@@ -49,18 +51,8 @@ final class AriaryType extends Type
     {
         return match (true) {
             $value === null => null,
-            $value instanceof Ariary => (string) $value->amount,
+            $value instanceof Ariary => $value->digits,
             default => throw InvalidType::new($value, self::NAME, ['null', Ariary::class]),
         };
-    }
-
-    /**
-     * @param numeric-string $value
-     */
-    private static function fromNumericText(string $value): Ariary
-    {
-        $number = $value + 0;
-
-        return \is_int($number) ? Ariary::fromInt($number) : Ariary::fromFloat($number);
     }
 }

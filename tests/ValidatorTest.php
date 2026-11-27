@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mdgascar\MdgUtilsBundle\Tests;
 
 use Mdgascar\MdgUtils\Ariary\Ariary;
+use Mdgascar\MdgUtils\Phone\PhoneLineType;
 use Mdgascar\MdgUtils\Phone\PhoneNumber;
 use Mdgascar\MdgUtilsBundle\AriaryOptions;
 use Mdgascar\MdgUtilsBundle\Validator\AriaryAmount;
@@ -23,6 +24,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class ValidatorTest extends KernelTestCase
 {
     private const string VALID_PHONE = '034 12 345 67';
+    private const string FIXED_LINE_PHONE = '020 22 421 19';
     // 031 is not assigned to any operator.
     private const string UNKNOWN_OPERATOR_PHONE = '031 12 345 67';
     private const int JSON_AMOUNT = 1500;
@@ -41,6 +43,10 @@ final class ValidatorTest extends KernelTestCase
         yield 'phone, empty' => [new MalagasyPhone(), '', true];
         yield 'phone, unknown operator' => [new MalagasyPhone(), self::UNKNOWN_OPERATOR_PHONE, false];
         yield 'phone, not text' => [new MalagasyPhone(), [self::VALID_PHONE], false];
+        yield 'phone, fixed line' => [new MalagasyPhone(), self::FIXED_LINE_PHONE, true];
+        yield 'mobile, mobile' => [new MalagasyPhone(type: PhoneLineType::Mobile), self::VALID_PHONE, true];
+        yield 'mobile, fixed line' => [new MalagasyPhone(type: PhoneLineType::Mobile), self::FIXED_LINE_PHONE, false];
+        yield 'fixed, mobile' => [new MalagasyPhone(type: PhoneLineType::Fixed), self::VALID_PHONE, false];
         yield 'ariary, text' => [new AriaryAmount(), 'Ar 1 500,50', true];
         yield 'ariary, JSON number' => [new AriaryAmount(), self::JSON_AMOUNT, true];
         yield 'ariary, an Ariary' => [new AriaryAmount(), Ariary::fromInt(self::JSON_AMOUNT), true];
@@ -55,11 +61,19 @@ final class ValidatorTest extends KernelTestCase
         self::assertSame($passes, $this->validate($value, $constraint)->count() === 0);
     }
 
+    public function testANumberOfTheWrongKindHasItsOwnMessageAndCode(): void
+    {
+        $violation = $this->validate(self::FIXED_LINE_PHONE, new MalagasyPhone(type: PhoneLineType::Mobile))->get(0);
+
+        self::assertSame('This value is not a valid Malagasy mobile number.', $violation->getMessage());
+        self::assertSame(MalagasyPhone::WRONG_TYPE_ERROR, $violation->getCode());
+    }
+
     public function testAViolationHasTheMessageAndTheCode(): void
     {
         $violation = $this->validate(self::UNKNOWN_OPERATOR_PHONE, new MalagasyPhone())->get(0);
 
-        self::assertSame('This value is not a valid Malagasy mobile number.', $violation->getMessage());
+        self::assertSame('This value is not a valid Malagasy phone number.', $violation->getMessage());
         self::assertSame(MalagasyPhone::INVALID_ERROR, $violation->getCode());
         self::assertSame('INVALID_MALAGASY_PHONE_ERROR', MalagasyPhone::getErrorName(MalagasyPhone::INVALID_ERROR));
     }
@@ -77,7 +91,8 @@ final class ValidatorTest extends KernelTestCase
      */
     public static function frenchMessages(): iterable
     {
-        yield 'phone' => [new MalagasyPhone(), 'Cette valeur n\'est pas un numéro de mobile malgache valide.'];
+        yield 'phone' => [new MalagasyPhone(), 'Cette valeur n\'est pas un numéro de téléphone malgache valide.'];
+        yield 'mobile' => [new MalagasyPhone(type: PhoneLineType::Mobile), 'Cette valeur n\'est pas un numéro de mobile malgache valide.'];
         yield 'ariary' => [new AriaryAmount(), 'Cette valeur n\'est pas un montant en ariary valide.'];
     }
 
