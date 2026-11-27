@@ -23,7 +23,7 @@
     },
     "require": {
         "php": ">=8.3",
-        "mdgascar/mdg-utils": "^0.8",
+        "mdgascar/mdg-utils": "^0.9",
         "symfony/config": "^7.4 || ^8.0",
         "symfony/dependency-injection": "^7.4 || ^8.0",
         "symfony/http-kernel": "^7.4 || ^8.0"
@@ -45,7 +45,7 @@
     },
     "suggest": {
         "symfony/validator": "For the MalagasyPhone and AriaryAmount constraints",
-        "twig/twig": "For the ariary, mg_phone, mg_words and mg_date filters",
+        "twig/twig": "For the ariary, mg_phone, mg_spell and mg_date filters",
         "doctrine/doctrine-bundle": "For the mg_phone and mg_ariary Doctrine types (doctrine/dbal 4)"
     },
     "conflict": {
