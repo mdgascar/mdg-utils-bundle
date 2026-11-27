@@ -1,0 +1,24 @@
+name: Set up mdg-utils-bundle PHP
+description: Install PHP with Xdebug and resolve dependencies for that PHP and Symfony version.
+inputs:
+  php-version:
+    description: PHP version
+    default: "8.4"
+  symfony-version:
+    description: Symfony version constraint, e.g. 7.4 or 8
+    default: "8"
+runs:
+  using: composite
+  steps:
+    - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+      with:
+        php-version: ${{ inputs.php-version }}
+        coverage: xdebug
+        tools: composer:v2
+    # Library convention: no composer.lock, so each PHP version resolves compatible tools.
+    - shell: bash
+      env:
+        SYMFONY: ${{ inputs.symfony-version }}
+      run: |
+        composer update --no-interaction --no-progress --prefer-dist --with-all-dependencies \
+          --with "symfony/http-kernel:^${SYMFONY}"
