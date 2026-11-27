@@ -20,10 +20,6 @@ use Mdgascar\MdgUtils\MdgUtilsException;
  */
 final readonly class AriaryOptions
 {
-    public const string GROUPING = 'grouping';
-    public const string SYMBOL_POSITION = 'symbol_position';
-    public const string DECIMAL = 'decimal';
-
     public function __construct(
         public Grouping $grouping = Grouping::DEFAULT,
         public SymbolPosition $symbolPosition = SymbolPosition::Before,
@@ -35,25 +31,6 @@ final readonly class AriaryOptions
                 $grouping->value,
             ));
         }
-    }
-
-    /**
-     * Reads the `mdg_utils.ariary` config section; a missing key keeps the core default. The
-     * bundle's config tree already rejects bad values when the container is built.
-     *
-     * Example: `AriaryOptions::fromConfig(['grouping' => 'dot'])->grouping` is `Grouping::Dot`.
-     *
-     * @param array<mixed> $config
-     *
-     * @throws \InvalidArgumentException naming the key, for a value that is not an option
-     */
-    public static function fromConfig(array $config): self
-    {
-        return new self(
-            self::option($config, self::GROUPING, Grouping::DEFAULT),
-            self::option($config, self::SYMBOL_POSITION, SymbolPosition::Before),
-            self::option($config, self::DECIMAL, DecimalSeparator::DEFAULT),
-        );
     }
 
     /**
@@ -100,32 +77,5 @@ final readonly class AriaryOptions
     private function readingGrouping(): ?Grouping
     {
         return $this->grouping === Grouping::Comma ? Grouping::Comma : null;
-    }
-
-    /**
-     * @template T of \BackedEnum
-     *
-     * @param array<mixed> $config
-     * @param T $default
-     *
-     * @return T
-     */
-    private static function option(array $config, string $key, \BackedEnum $default): \BackedEnum
-    {
-        $value = $config[$key] ?? null;
-        if ($value === null) {
-            return $default;
-        }
-        $option = \is_string($value) ? $default::tryFrom($value) : null;
-        if ($option === null) {
-            throw new \InvalidArgumentException(\sprintf(
-                'mdg_utils.ariary.%s must be one of "%s", got %s.',
-                $key,
-                implode('", "', array_map(static fn(\BackedEnum $case): int|string => $case->value, $default::cases())),
-                var_export($value, true),
-            ));
-        }
-
-        return $option;
     }
 }
