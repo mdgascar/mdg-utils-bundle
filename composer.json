@@ -1,0 +1,86 @@
+{
+    "name": "mdgascar/mdg-utils-bundle",
+    "description": "Symfony bundle: validation constraints, Twig filters and Doctrine types for Malagasy phone numbers, Ariary amounts, number words and dates.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": [
+        "symfony",
+        "symfony-bundle",
+        "madagascar",
+        "malagasy",
+        "ariary",
+        "phone-number",
+        "validation",
+        "twig",
+        "doctrine"
+    ],
+    "homepage": "https://github.com/mdgascar/mdg-utils-bundle",
+    "support": {
+        "issues": "https://github.com/mdgascar/mdg-utils-bundle/issues",
+        "source": "https://github.com/mdgascar/mdg-utils-bundle",
+        "security": "https://github.com/mdgascar/mdg-utils-bundle/security/policy",
+        "docs": "https://mdgascar.github.io/mdg-utils-docs/"
+    },
+    "require": {
+        "php": ">=8.3",
+        "mdgascar/mdg-utils": "^0.7",
+        "symfony/config": "^7.4 || ^8.0",
+        "symfony/dependency-injection": "^7.4 || ^8.0",
+        "symfony/http-kernel": "^7.4 || ^8.0"
+    },
+    "require-dev": {
+        "doctrine/dbal": "^4.0",
+        "doctrine/doctrine-bundle": "^2.13 || ^3.0",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.3",
+        "phpstan/phpstan-strict-rules": "^2.1",
+        "phpunit/phpunit": "^12.5 || ^13.4",
+        "povils/phpmnd": "^3.6",
+        "symfony/filesystem": "^7.4 || ^8.0",
+        "symfony/framework-bundle": "^7.4 || ^8.0",
+        "symfony/translation": "^7.4 || ^8.0",
+        "symfony/twig-bundle": "^7.4 || ^8.0",
+        "symfony/validator": "^7.4 || ^8.0",
+        "twig/twig": "^3.15"
+    },
+    "suggest": {
+        "symfony/validator": "For the MalagasyPhone and AriaryAmount constraints",
+        "twig/twig": "For the ariary, mg_phone, mg_words and mg_date filters",
+        "doctrine/doctrine-bundle": "For the mg_phone and mg_ariary Doctrine types (doctrine/dbal 4)"
+    },
+    "conflict": {
+        "doctrine/dbal": "<4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mdgascar\\MdgUtilsBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mdgascar\\MdgUtilsBundle\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": [
+            "@putenv XDEBUG_MODE=coverage",
+            "phpunit --coverage-text=build/coverage.txt --coverage-clover=build/clover.xml",
+            "php tools/coverage/check.php build/clover.xml"
+        ],
+        "cs": "php-cs-fixer check --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "stan": "phpstan analyse --no-progress",
+        "mnd": "phpmnd src tests translations tools --extensions=all --ignore-numbers=0,1,-1 --include-numeric-string",
+        "lint": [
+            "@composer validate --strict",
+            "@cs",
+            "@stan",
+            "@mnd"
+        ]
+    }
+}

@@ -1,0 +1,42 @@
+name: Bug report
+description: Wrong output or a crash
+labels: [bug, triage]
+body:
+  - type: dropdown
+    id: module
+    attributes:
+      label: Area
+      options:
+        - validation constraints
+        - Twig filters
+        - Doctrine types
+        - config
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Package and PHP version
+      placeholder: "mdgascar/mdg-utils-bundle 0.1.0, Symfony 8.1, PHP 8.4"
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: Input
+      description: The exact code, e.g. `$validator->validate('034 12 345 67', new MalagasyPhone())`.
+      render: php
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected output
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual output or error
+    validations:
+      required: true
