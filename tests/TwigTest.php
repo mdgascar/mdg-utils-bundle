@@ -62,6 +62,16 @@ final class TwigTest extends KernelTestCase
         }
     }
 
+    public function testAnUnknownFormatNameThrows(): void
+    {
+        try {
+            $this->render($this->twig(), "{{ v|mg_phone('fancy') }}", self::E164);
+            self::fail('Expected an exception');
+        } catch (RuntimeError $error) {
+            self::assertInstanceOf(\ValueError::class, $error->getPrevious());
+        }
+    }
+
     public function testWithoutTwigTheExtensionIsNotRegistered(): void
     {
         self::assertFalse($this->boot([], minimal: true)->has(MdgUtilsExtension::class));

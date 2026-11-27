@@ -29,6 +29,9 @@ final class MdgUtilsBundle extends AbstractBundle
 {
     private const string DOCTRINE = 'doctrine';
     private const string ARIARY = 'ariary';
+    private const string GROUPING = 'grouping';
+    private const string SYMBOL_POSITION = 'symbol_position';
+    private const string DECIMAL = 'decimal';
 
     public function configure(DefinitionConfigurator $definition): void
     {
@@ -38,24 +41,24 @@ final class MdgUtilsBundle extends AbstractBundle
                     ->info('How the ariary filter, the AriaryAmount constraint and the mg_ariary type write and read amounts.')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->enumNode(AriaryOptions::GROUPING)
+                        ->enumNode(self::GROUPING)
                             ->info('Thousands separator: space (Ar 1 500), dot (Ar 1.500) or comma (Ar 1,500, English style; amounts are then read in that style only).')
-                            ->values(self::values(Grouping::cases()))
-                            ->defaultValue(Grouping::DEFAULT->value)
+                            ->enumFqcn(Grouping::class)
+                            ->defaultValue(Grouping::DEFAULT)
                         ->end()
-                        ->enumNode(AriaryOptions::SYMBOL_POSITION)
+                        ->enumNode(self::SYMBOL_POSITION)
                             ->info('before (Ar 1 500) or after (1 500 Ar).')
-                            ->values(self::values(SymbolPosition::cases()))
-                            ->defaultValue(SymbolPosition::Before->value)
+                            ->enumFqcn(SymbolPosition::class)
+                            ->defaultValue(SymbolPosition::Before)
                         ->end()
-                        ->enumNode(AriaryOptions::DECIMAL)
+                        ->enumNode(self::DECIMAL)
                             ->info('Decimal separator: comma (Ar 1 500,50) or dot. It must differ from the grouping.')
-                            ->values(self::values(DecimalSeparator::cases()))
-                            ->defaultValue(DecimalSeparator::DEFAULT->value)
+                            ->enumFqcn(DecimalSeparator::class)
+                            ->defaultValue(DecimalSeparator::DEFAULT)
                         ->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(static fn(array $ariary): bool => $ariary[AriaryOptions::GROUPING] === $ariary[AriaryOptions::DECIMAL])
+                        ->ifTrue(self::sameGroupingAndDecimal(...))
                         ->thenInvalid('grouping and decimal cannot be the same character: %s')
                     ->end()
                 ->end()
@@ -68,9 +71,13 @@ final class MdgUtilsBundle extends AbstractBundle
     public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
     {
         $services = $configurator->services();
-        $services->set(AriaryOptions::class)
-            ->factory([AriaryOptions::class, 'fromConfig'])
-            ->args([$config[self::ARIARY]]);
+        // The config tree has already checked each option and turned it into its enum.
+        $ariary = \is_array($config[self::ARIARY]) ? $config[self::ARIARY] : [];
+        $services->set(AriaryOptions::class)->args([
+            $ariary[self::GROUPING],
+            $ariary[self::SYMBOL_POSITION],
+            $ariary[self::DECIMAL],
+        ]);
 
         if (class_exists(ConstraintValidator::class)) {
             $services->set(MalagasyPhoneValidator::class)->tag('validator.constraint_validator');
@@ -103,12 +110,10 @@ final class MdgUtilsBundle extends AbstractBundle
     }
 
     /**
-     * @param list<\BackedEnum> $cases
-     *
-     * @return list<int|string>
+     * @param array{grouping: Grouping, symbol_position: SymbolPosition, decimal: DecimalSeparator} $ariary
      */
-    private static function values(array $cases): array
+    private static function sameGroupingAndDecimal(array $ariary): bool
     {
-        return array_map(static fn(\BackedEnum $case): int|string => $case->value, $cases);
+        return $ariary[self::GROUPING]->value === $ariary[self::DECIMAL]->value;
     }
 }

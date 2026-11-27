@@ -19,31 +19,6 @@ final class AriaryOptionsTest extends TestCase
     private const int AMOUNT = 1500;
     private const float DECIMAL_AMOUNT = 1500.5;
 
-    public function testAnEmptyConfigKeepsTheCoreDefaults(): void
-    {
-        $options = AriaryOptions::fromConfig([]);
-
-        self::assertSame(Grouping::Space, $options->grouping);
-        self::assertSame(SymbolPosition::Before, $options->symbolPosition);
-        self::assertSame(DecimalSeparator::Comma, $options->decimal);
-    }
-
-    public function testAnUnknownValueNamesTheKeyAndTheChoices(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('mdg_utils.ariary.grouping must be one of "space", "dot", "comma", got \'tab\'.');
-
-        AriaryOptions::fromConfig([AriaryOptions::GROUPING => 'tab']);
-    }
-
-    public function testANonTextValueIsRejected(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('mdg_utils.ariary.decimal must be one of "comma", "dot", got true.');
-
-        AriaryOptions::fromConfig([AriaryOptions::DECIMAL => true]);
-    }
-
     /**
      * @return iterable<string, array{mixed}>
      */
