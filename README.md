@@ -86,14 +86,16 @@ parse). A stored value that is not a valid number or amount fails with Doctrine'
 {{ order.phone|mg_phone }}                  {# 034 12 345 67 #}
 {{ order.phone|mg_phone('international') }} {# +261 34 12 345 67 #}
 {{ 2026|mg_words }}                         {# enina amby roapolo sy roa arivo #}
+{{ 30000000|mg_words('traditional') }}      {# telo safatsiroa #}
 {{ order.createdAt|mg_date }}               {# 27 Novambra 2026 #}
 {{ order.createdAt|mg_date('numeric') }}    {# 27/11/2026 #}
 ```
 
 Each filter takes the typed value (`Ariary`, `PhoneNumber`, any `DateTimeInterface`) or
 the raw one (an int, phone text, an ISO date such as `2026-11-27`), and prints nothing for
-`null`. The format names are the `PhoneNumberFormat` and `DateStyle` values
-(`e164`, `international`, `national`; `short`, `medium`, `long`, `full`, `numeric`); an
+`null`. The format names are the `PhoneNumberFormat`, `DateStyle` and `NumberSystem` values
+(`e164`, `international`, `national`; `short`, `medium`, `long`, `full`, `numeric`;
+`standard`, `traditional`); an
 unknown name throws `ValueError`. Invalid input throws `MdgUtilsException`.
 
 ## Configuration

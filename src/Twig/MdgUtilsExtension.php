@@ -9,6 +9,7 @@ use Mdgascar\MdgUtils\Date\DateStyle;
 use Mdgascar\MdgUtils\Date\MalagasyDate;
 use Mdgascar\MdgUtils\Phone\PhoneNumber;
 use Mdgascar\MdgUtils\Phone\PhoneNumberFormat;
+use Mdgascar\MdgUtils\Words\NumberSystem;
 use Mdgascar\MdgUtils\Words\NumberWords;
 use Mdgascar\MdgUtilsBundle\AriaryOptions;
 use Twig\Extension\AbstractExtension;
@@ -62,14 +63,17 @@ final class MdgUtilsExtension extends AbstractExtension
     }
 
     /**
-     * `{{ 21|mg_words }}` prints `iraika amby roapolo`.
+     * `{{ 21|mg_words }}` prints `iraika amby roapolo`; `{{ 30000000|mg_words('traditional') }}`
+     * prints `telo safatsiroa`, one name per power of ten.
      */
-    public function words(int|float|null $number): string
+    public function words(int|float|null $number, NumberSystem|string $system = NumberSystem::Standard): string
     {
+        $system = \is_string($system) ? NumberSystem::from($system) : $system;
+
         return match (true) {
             $number === null => self::NOTHING,
-            \is_int($number) => NumberWords::fromInt($number),
-            default => NumberWords::fromFloat($number),
+            \is_int($number) => NumberWords::fromInt($number, $system),
+            default => NumberWords::fromFloat($number, $system),
         };
     }
 
