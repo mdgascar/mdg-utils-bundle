@@ -1,0 +1,18 @@
+ci:
+  - changed-files:
+      - any-glob-to-any-file: [.github/**, justfile, renovate.json]
+docs:
+  - changed-files:
+      - any-glob-to-any-file: "**/*.md"
+validation:
+  - changed-files:
+      - any-glob-to-any-file: ["src/Validator/**", "tests/ValidatorTest.php", "translations/**"]
+twig:
+  - changed-files:
+      - any-glob-to-any-file: ["src/Twig/**", "tests/TwigTest.php"]
+doctrine:
+  - changed-files:
+      - any-glob-to-any-file: ["src/Doctrine/**", "tests/DoctrineTypeTest.php"]
+config:
+  - changed-files:
+      - any-glob-to-any-file: ["src/MdgUtilsBundle.php", "src/AriaryOptions.php", "tests/ConfigTest.php"]
