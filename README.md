@@ -3,7 +3,7 @@
 [![CI](https://github.com/mdgascar/mdg-utils-bundle/actions/workflows/ci.yml/badge.svg)](https://github.com/mdgascar/mdg-utils-bundle/actions/workflows/ci.yml)
 [![Packagist](https://img.shields.io/packagist/v/mdgascar/mdg-utils-bundle)](https://packagist.org/packages/mdgascar/mdg-utils-bundle)
 
-Symfony validation constraints, Twig filters and Doctrine types for Malagasy mobile phone
+Symfony validation constraints, Twig filters and Doctrine types for Malagasy phone
 numbers, Ariary amounts, number words and dates. Symfony 7.4 LTS and 8, PHP 8.3+
 (Symfony 8 needs PHP 8.4).
 
@@ -44,13 +44,15 @@ final class OrderInput
 
 | Constraint | Passes for | Fails for |
 | --- | --- | --- |
-| `MalagasyPhone` | `034 12 345 67`, `+261 34 12 345 67`, a `PhoneNumber` | `031 12 345 67` (no operator), anything not text |
+| `MalagasyPhone` | `034 12 345 67`, `+261 34 12 345 67`, `020 22 421 19` (fixed line), a `PhoneNumber` | `031 12 345 67` (no operator), anything not text |
+| `MalagasyPhone(type: PhoneLineType::Mobile)` | `034 12 345 67` | `020 22 421 19` (fixed line) |
 | `AriaryAmount` | `Ar 1 500`, `1.500 Ar`, `1 500,50`, `1500` from JSON, an `Ariary` | `-1`, `1.5` (a dot is not a decimal point by default), `abc` |
 
 `null` and `''` pass, as with Symfony's own constraints: add `NotBlank` to require a value.
 Messages come in English and French (domain `validators`) and can be changed per use with
 `message:`, e.g. `#[MalagasyPhone(message: 'Use a Malagasy mobile number.')]`. The violation
-codes are `MalagasyPhone::INVALID_ERROR` and `AriaryAmount::INVALID_ERROR`.
+codes are `MalagasyPhone::INVALID_ERROR`, `MalagasyPhone::WRONG_TYPE_ERROR` (a number of the
+other kind) and `AriaryAmount::INVALID_ERROR`.
 
 ## Doctrine types
 
@@ -86,6 +88,7 @@ parse). A stored value that is not a valid number or amount fails with Doctrine'
 {{ order.phone|mg_phone }}                  {# 034 12 345 67 #}
 {{ order.phone|mg_phone('international') }} {# +261 34 12 345 67 #}
 {{ 2026|mg_spell }}                         {# enina amby roapolo sy roa arivo #}
+{{ 3|mg_ordinal }}                          {# fahatelo #}
 {{ 30000000|mg_spell('traditional') }}      {# telo safatsiroa #}
 {{ order.createdAt|mg_date }}               {# 27 Novambra 2026 #}
 {{ order.createdAt|mg_date('numeric') }}    {# 27/11/2026 #}

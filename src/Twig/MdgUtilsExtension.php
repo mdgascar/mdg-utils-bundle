@@ -36,6 +36,7 @@ final class MdgUtilsExtension extends AbstractExtension
             new TwigFilter('ariary', $this->ariary(...)),
             new TwigFilter('mg_phone', $this->phone(...)),
             new TwigFilter('mg_spell', $this->spell(...)),
+            new TwigFilter('mg_ordinal', $this->ordinal(...)),
             new TwigFilter('mg_date', $this->date(...)),
         ];
     }
@@ -72,6 +73,16 @@ final class MdgUtilsExtension extends AbstractExtension
         $system = \is_string($system) ? NumberSystem::from($system) : $system;
 
         return $number === null ? self::NOTHING : NumberWords::spell($number, $system);
+    }
+
+    /**
+     * `{{ 3|mg_ordinal }}` prints `fahatelo`; `{{ 1|mg_ordinal }}` prints `voalohany`.
+     */
+    public function ordinal(int|string|null $number, NumberSystem|string $system = NumberSystem::Standard): string
+    {
+        $system = \is_string($system) ? NumberSystem::from($system) : $system;
+
+        return $number === null ? self::NOTHING : NumberWords::spellOrdinal($number, $system);
     }
 
     /**

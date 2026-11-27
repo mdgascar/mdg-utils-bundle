@@ -16,11 +16,15 @@ final class MalagasyPhoneValidator extends ConstraintValidator
         if (!$constraint instanceof MalagasyPhone) {
             throw new UnexpectedTypeException($constraint, MalagasyPhone::class);
         }
-        if ($value === null || $value === '' || $value instanceof PhoneNumber || PhoneNumber::isValid($value)) {
+        if ($value === null || $value === '') {
             return;
         }
-        $this->context->buildViolation($constraint->message)
-            ->setCode(MalagasyPhone::INVALID_ERROR)
+        $phone = $value instanceof PhoneNumber ? $value : PhoneNumber::tryParse($value);
+        if ($phone !== null && ($constraint->type === null || $phone->type === $constraint->type)) {
+            return;
+        }
+        $this->context->buildViolation($constraint->messageFor($constraint->type))
+            ->setCode($phone === null ? MalagasyPhone::INVALID_ERROR : MalagasyPhone::WRONG_TYPE_ERROR)
             ->addViolation();
     }
 }
