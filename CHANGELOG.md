@@ -4,6 +4,12 @@
 Merging `dev` into `main` tags the version in the first heading below and creates the
 GitHub release; Packagist picks up the tag.
 
+## 0.2.0
+
+- **Breaking:** the `mg_words` filter is now `mg_spell`, in the domain's words (core 0.9.0). It
+  also reads exact decimal text: `{{ '2000000000000000.9'|mg_spell }}`. Requires
+  `mdgascar/mdg-utils` ^0.9.
+
 ## 0.1.0
 
 First release. Symfony 7.4 LTS and 8, PHP 8.3+, `mdgascar/mdg-utils` ^0.8.

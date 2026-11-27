@@ -16,7 +16,7 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * The `ariary`, `mg_phone`, `mg_words` and `mg_date` filters. Each takes the typed value or
+ * The `ariary`, `mg_phone`, `mg_spell` and `mg_date` filters. Each takes the typed value or
  * the raw one an app usually has at hand, and prints `''` for `null`.
  *
  * Invalid input throws `MdgUtilsException`, like the core: a wrong value in a template is a
@@ -35,7 +35,7 @@ final class MdgUtilsExtension extends AbstractExtension
         return [
             new TwigFilter('ariary', $this->ariary(...)),
             new TwigFilter('mg_phone', $this->phone(...)),
-            new TwigFilter('mg_words', $this->words(...)),
+            new TwigFilter('mg_spell', $this->spell(...)),
             new TwigFilter('mg_date', $this->date(...)),
         ];
     }
@@ -63,18 +63,15 @@ final class MdgUtilsExtension extends AbstractExtension
     }
 
     /**
-     * `{{ 21|mg_words }}` prints `iraika amby roapolo`; `{{ 30000000|mg_words('traditional') }}`
-     * prints `telo safatsiroa`, one name per power of ten.
+     * `{{ 21|mg_spell }}` prints `iraika amby roapolo`; `{{ 30000000|mg_spell('traditional') }}`
+     * prints `telo safatsiroa`, one name per power of ten. Decimal text is read exactly:
+     * `{{ '2000000000000000.9'|mg_spell }}`.
      */
-    public function words(int|float|null $number, NumberSystem|string $system = NumberSystem::Standard): string
+    public function spell(int|float|string|null $number, NumberSystem|string $system = NumberSystem::Standard): string
     {
         $system = \is_string($system) ? NumberSystem::from($system) : $system;
 
-        return match (true) {
-            $number === null => self::NOTHING,
-            \is_int($number) => NumberWords::fromInt($number, $system),
-            default => NumberWords::fromFloat($number, $system),
-        };
+        return $number === null ? self::NOTHING : NumberWords::spell($number, $system);
     }
 
     /**

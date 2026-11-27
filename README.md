@@ -85,8 +85,8 @@ parse). A stored value that is not a valid number or amount fails with Doctrine'
 {{ order.total|ariary }}                    {# Ar 1 500 #}
 {{ order.phone|mg_phone }}                  {# 034 12 345 67 #}
 {{ order.phone|mg_phone('international') }} {# +261 34 12 345 67 #}
-{{ 2026|mg_words }}                         {# enina amby roapolo sy roa arivo #}
-{{ 30000000|mg_words('traditional') }}      {# telo safatsiroa #}
+{{ 2026|mg_spell }}                         {# enina amby roapolo sy roa arivo #}
+{{ 30000000|mg_spell('traditional') }}      {# telo safatsiroa #}
 {{ order.createdAt|mg_date }}               {# 27 Novambra 2026 #}
 {{ order.createdAt|mg_date('numeric') }}    {# 27/11/2026 #}
 ```
