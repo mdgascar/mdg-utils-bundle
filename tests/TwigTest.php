@@ -21,6 +21,8 @@ final class TwigTest extends KernelTestCase
     private const float WORDS_DECIMAL = 0.5;
     // 30 000 000: 'telopolo tapitrisa' in the standard system.
     private const int TRADITIONAL_NUMBER = 30_000_000;
+    // A float this large has lost its decimals; text keeps them (core spec words rule 13).
+    private const string EXACT_TEXT = '2000000000000000.9';
     private const string ISO_DATE = '2026-11-27';
 
     /**
@@ -32,12 +34,13 @@ final class TwigTest extends KernelTestCase
         yield 'ariary from an Ariary' => ['{{ v|ariary }}', Ariary::fromFloat(self::DECIMAL_AMOUNT), self::nbsp('Ar 1 500,5')];
         yield 'phone from text' => ['{{ v|mg_phone }}', self::E164, '034 12 345 67'];
         yield 'phone with a format' => ["{{ v|mg_phone('international') }}", PhoneNumber::parse(self::E164), '+261 34 12 345 67'];
-        yield 'words from an int' => ['{{ v|mg_words }}', self::WORDS_NUMBER, 'iraika amby roapolo'];
-        yield 'words from a float' => ['{{ v|mg_words }}', self::WORDS_DECIMAL, 'aotra faingo dimy'];
-        yield 'words in the traditional system' => ["{{ v|mg_words('traditional') }}", self::TRADITIONAL_NUMBER, 'telo safatsiroa'];
+        yield 'words from an int' => ['{{ v|mg_spell }}', self::WORDS_NUMBER, 'iraika amby roapolo'];
+        yield 'words from a float' => ['{{ v|mg_spell }}', self::WORDS_DECIMAL, 'aotra faingo dimy'];
+        yield 'spell exact decimal text' => ['{{ v|mg_spell }}', self::EXACT_TEXT, 'roa tapitrisa lavitrisa faingo sivy'];
+        yield 'words in the traditional system' => ["{{ v|mg_spell('traditional') }}", self::TRADITIONAL_NUMBER, 'telo safatsiroa'];
         yield 'date from a DateTime' => ['{{ v|mg_date }}', new \DateTimeImmutable(self::ISO_DATE), '27 Novambra 2026'];
         yield 'date from text with a style' => ["{{ v|mg_date('numeric') }}", self::ISO_DATE, '27/11/2026'];
-        foreach (['ariary', 'mg_phone', 'mg_words', 'mg_date'] as $filter) {
+        foreach (['ariary', 'mg_phone', 'mg_spell', 'mg_date'] as $filter) {
             yield "{$filter} prints nothing for null" => ["{{ v|{$filter} }}", null, ''];
         }
     }
